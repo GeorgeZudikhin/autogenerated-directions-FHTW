@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import logo from './assets/Logo.jpg';
 import fhtwlogo from  './assets/fhtw_logo.svg.png';
 import adiobook from  './assets/audiobook.PNG';
@@ -16,7 +17,11 @@ import Linkedin from  './assets/icons/linkedin.png';
 import Email from  './assets/icons/mail.png';
 import { Link } from 'react-router-dom';
 
+
 function App2(){
+    const location = useLocation();
+    const pathDescription = location.state?.pathDescription || 'No path description available';
+    console.log("Path Description in App2:", pathDescription); // Log the path description
     const [contrastMode, setContrastMode] = useState(false);
     const [fontSize, setFontSize] = useState(16); // Initial font size of 16px
     const [isParagraphLarge, setIsParagraphLarge] = useState(false);
@@ -96,7 +101,16 @@ function App2(){
    </div>
    <div className="content-container" style={{ textAlign: 'center' }}>
                 <h1 style={{ color: '#0a65c0' }}>Pathfinding for All - Enter Your Route and Explore FHTW</h1>
+                <div>
+                  <h1>Path Description</h1>
+                  <p>{pathDescription}</p>
                 </div>
+  </div>
+  <div className={'button-container'}>
+    <Link to="/">
+    <button>Neue Suche</button>
+    </Link>
+  </div>
    <nav className={'footer-nav'} style={{ textAlign: 'center', bottom: 0}}>
                  <ul style={{ listStyle: 'none', padding: 0 }}>
                 <li><Link to="/">Startseite</Link></li>

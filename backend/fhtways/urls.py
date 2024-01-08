@@ -1,6 +1,6 @@
 from django.urls import path
-from . import views
+from .views import PathFindingView
 
 urlpatterns = [
-    path('pathfinding/<str:start>/<str:end>/', views.pathfinding),
+    path('find-path/', PathFindingView.as_view(), name='find-path'),
 ]

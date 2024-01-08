@@ -1,16 +1,26 @@
-from django.shortcuts import render
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .graph_setup_coord import create_graph, find_shortest_path
+import json
 
-# Create your views here.
-from django.http import HttpResponse
-from .graph_setup_coord import *
+class PathFindingView(APIView):
 
-def pathfinding(request, start, end):
-    graph = create_graph()
-    path, descriptions = find_shortest_path(graph, start, end)
+    """
+    API View to find the shortest path between two points in a graph.
+    Expects 'start' and 'end' in the POST request data.
+    """
 
-    description_text = "Path: "
-    description_text += ' -> '. join(path)
-    description_text += '\n'
-    description_text += "Descriptions: "
-    description_text += ' '.join(descriptions)
-    return HttpResponse(description_text, content_type="text/plain; charset=utf-8")
+    def post(self, request):
+        data = json.loads(request.body)
+        start = data.get('start')
+        end = data.get('end')
+
+        try:
+            graph = create_graph()
+            _, descriptions = find_shortest_path(graph, start, end)
+
+            return Response({"path": descriptions}, status=status.HTTP_200_OK)
+
+        except Exception as e: 
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
