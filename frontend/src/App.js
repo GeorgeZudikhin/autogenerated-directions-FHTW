@@ -96,45 +96,53 @@ function MainApp() {
   }
  };
   
-  useEffect(() => {
-    const handleKeyPress = (event) => {
-        if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
-            return;
-        }
+ const handleKeyPress = (event) => {
+  const key = event.key.toLowerCase(); // Get the pressed key in lowercase
 
-        switch(event.key) {
-            case '+':
-                increaseFontSize(); // increases the font size
-                break;
-            case '-':
-                decreaseFontSize(); // resets the font size
-                break;
-            case 'c':
-                toggleContrast(); // changes the contrast
-                break;
-            case 'd':
-                resetContrast(); // resets the contrast
-                break;
-            case 'z':
-                increaseLineHeight(); // increases the line spacing
-                break;
-            case 't':
-                resetLineHeight(); // resets the line spacing
-                break;
-            case 'r':
-                resetAll(); // resets everything
-                break;
-            default:
-                break;
-        }
-    };
+  // Ignore the event if the target element is an input or textarea
+  if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+      return;
+  }
 
-    window.addEventListener('keydown', handleKeyPress);
+  // Check if the key is a valid shortcut key and there are no modifier keys pressed
+  if (!event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey) {
+      switch (key) {
+          case '+':
+              increaseFontSize(); // Increase the font size
+              break;
+          case '-':
+              decreaseFontSize(); // Decrease the font size
+              break;
+          case 'c':
+              toggleContrast(); // Toggle contrast mode
+              break;
+          case 'd':
+              resetContrast(); // Reset contrast mode
+              break;
+          case 'z':
+              increaseLineHeight(); // Increase line height
+              break;
+          case 't':
+              resetLineHeight(); // Reset line height
+              break;
+          case 'r':
+              resetAll(); // Reset all settings
+              break;
+          default:
+              break;
+      }
+  }
+};
 
-    return () => {
-        window.removeEventListener('keydown', handleKeyPress);
-    };
-}, [fontSize,lineHeight]); 
+// Attach the event listener for key presses
+useEffect(() => {
+  window.addEventListener('keydown', handleKeyPress);
+
+  // Clean up by removing the event listener when component unmounts
+  return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+  };
+}, [fontSize, lineHeight]); // Re-run effect when fontSize or lineHeight change
 
     const handleFindPath = async () => {
         console.log("start: ", startNode);
@@ -171,17 +179,57 @@ function MainApp() {
 
 
  //input
-  const handleStartNodeChange = (e) => {
-    const input = e.target.value.trim().toUpperCase();
-    setStartNode(input);
-    validateInput(input, endNode);
-  };
+ const handleStartNodeChange = (e) => {
+  const input = e.target.value;
+  const formattedInput = formatRoomNumber(input);
+  setStartNode(formattedInput);
+  validateInput(formattedInput, endNode);
+};
 
-  const handleEndNodeChange = (e) => {
-    const input = e.target.value.trim().toUpperCase();
-    setEndNode(input);
-    validateInput(startNode, input);
-  };
+const handleEndNodeChange = (e) => {
+  const input = e.target.value;
+  const formattedInput = formatRoomNumber(input);
+  setEndNode(formattedInput);
+  validateInput(startNode, formattedInput);
+};
+
+const formatRoomNumber = (input) => {
+  // Regular expression to match valid room number formats: building + floor + room
+  const validFormatRegex = /^([A-Z])(\d+)(?:\.(\d+))?$/;
+
+  // Check if the input matches the valid format
+  const match = input.trim().toUpperCase().match(validFormatRegex);
+
+  if (!match) {
+    return input; // Return input as-is if it doesn't match the expected format
+  }
+
+  // Extract building, floor, and room number from the matched groups
+  const [, building, floor, room] = match;
+
+  if (room) {
+    // If the room number is already in the correct format (e.g., F4.24), return it unchanged
+    return `${building}${floor}.${room}`;
+  } else {
+    // If the room number is in simplified format (e.g., F424), format it as F4.24
+    const roomInfo = floor; // Use 'floor' as the roomInfo
+    if (roomInfo.length === 3) {
+      // If roomInfo has length 3 (e.g., "424"), assume the first character is the floor
+      const floorNumber = roomInfo.charAt(0);
+      const roomNumber = roomInfo.substring(1);
+      return `${building}${floorNumber}.${roomNumber}`;
+    } else if (roomInfo.length === 4) {
+      // If roomInfo has length 4 (e.g., "0424"), the first two characters are considered the floor
+      const floorNumber = roomInfo.substring(0, 2);
+      const roomNumber = roomInfo.substring(2);
+      return `${building}${floorNumber}.${roomNumber}`;
+    } else {
+      return input; // Return input as-is if the roomInfo length is unexpected
+    }
+  }
+};
+
+
 
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -271,7 +319,7 @@ function MainApp() {
             
             <div>
                 <div className="content-container" style={{ textAlign: 'center', fontSize: `${fontSize}px` }}>
-                <h1 style={{ color: '#0a65c0' }}>Pathfinding for All - Enter Your Route and Explore FHTW</h1>
+                <h1 lang="en" style={{ color: '#0a65c0' }}>Pathfinding for All - Enter Your Route and Explore FHTW</h1>
                 </div>
                 
                 <div className="content-container"style={{ fontSize: `${fontSize}px` }}>        
