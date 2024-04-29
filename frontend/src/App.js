@@ -194,42 +194,58 @@ const handleEndNodeChange = (e) => {
 };
 
 const formatRoomNumber = (input) => {
-  // Regular expression to match valid room number formats: building + floor + room
-  const validFormatRegex = /^([A-Z])(\d+)(?:\.(\d+))?$/;
+  // Regular expression to match room number formats: building + floor + room
+  const validFormatRegex = /^([A-Z])(\d+)(?:\.(\d+))?$/i;
 
   // Check if the input matches the valid format
   const match = input.trim().toUpperCase().match(validFormatRegex);
 
   if (!match) {
-    return input; // Return input as-is if it doesn't match the expected format
+      // If no match, attempt to parse the input more flexibly
+      const cleanedInput = input.replace(/[^A-Z0-9]/ig, ''); // Remove non-alphanumeric characters
+      const building = cleanedInput.match(/[A-Z]/i)?.[0] || ''; // Extract building (first letter)
+      const numbers = cleanedInput.match(/\d+/g); // Extract all numeric sequences
+
+      if (building && numbers) {
+          const floor = numbers[0];
+          const room = numbers[1] || '';
+
+          if (room) {
+              // Return formatted room number (building + floor + room)
+              return `${building}${floor}.${room}`;
+          } else {
+              // Return formatted floor number only (building + floor)
+              return `${building}${floor}`;
+          }
+      }
+
+      return input; // Return input as-is if unable to parse
   }
 
   // Extract building, floor, and room number from the matched groups
   const [, building, floor, room] = match;
 
   if (room) {
-    // If the room number is already in the correct format (e.g., F4.24), return it unchanged
-    return `${building}${floor}.${room}`;
+      // If the room number is already in the correct format (e.g., F4.24), return it unchanged
+      return `${building}${floor}.${room}`;
   } else {
-    // If the room number is in simplified format (e.g., F424), format it as F4.24
-    const roomInfo = floor; // Use 'floor' as the roomInfo
-    if (roomInfo.length === 3) {
-      // If roomInfo has length 3 (e.g., "424"), assume the first character is the floor
-      const floorNumber = roomInfo.charAt(0);
-      const roomNumber = roomInfo.substring(1);
-      return `${building}${floorNumber}.${roomNumber}`;
-    } else if (roomInfo.length === 4) {
-      // If roomInfo has length 4 (e.g., "0424"), the first two characters are considered the floor
-      const floorNumber = roomInfo.substring(0, 2);
-      const roomNumber = roomInfo.substring(2);
-      return `${building}${floorNumber}.${roomNumber}`;
-    } else {
-      return input; // Return input as-is if the roomInfo length is unexpected
-    }
+      // If the room number is in simplified format (e.g., F424), format it as F4.24
+      const roomInfo = floor; // Use 'floor' as the roomInfo
+      if (roomInfo.length === 3) {
+          // If roomInfo has length 3 (e.g., "424"), assume the first character is the floor
+          const floorNumber = roomInfo.charAt(0);
+          const roomNumber = roomInfo.substring(1);
+          return `${building}${floorNumber}.${roomNumber}`;
+      } else if (roomInfo.length === 4) {
+          // If roomInfo has length 4 (e.g., "0424"), the first two characters are considered the floor
+          const floorNumber = roomInfo.substring(0, 2);
+          const roomNumber = roomInfo.substring(2);
+          return `${building}${floorNumber}.${roomNumber}`;
+      } else {
+          return input; // Return input as-is if the roomInfo length is unexpected
+      }
   }
 };
-
-
 
   const [errorMessage, setErrorMessage] = useState('');
 
