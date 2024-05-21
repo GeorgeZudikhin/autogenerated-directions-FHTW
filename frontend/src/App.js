@@ -18,6 +18,8 @@ import App2 from './App2.js';
 
 
 function MainApp() {
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  console.log(process.env, 'ENV');
   const navigate = useNavigate();
   const [contrastMode, setContrastMode] = useState(false);
   const [fontSize, setFontSize] = useState(16); // Initial font size of 16px
@@ -149,7 +151,7 @@ useEffect(() => {
         console.log("end: ", endNode);
 
         try {
-            const response = await fetch('http://localhost:8000/fhtways/find-path/', {
+            const response = await fetch(`${backendUrl}/fhtways/find-path/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
