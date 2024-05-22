@@ -99,52 +99,56 @@ function MainApp() {
  };
   
  const handleKeyPress = (event) => {
-  const key = event.key.toLowerCase(); // Get the pressed key in lowercase
+  if (event.key) {
+      const key = event.key.toLowerCase(); // Get the pressed key in lowercase
 
-  // Ignore the event if the target element is an input or textarea
-  if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
-      return;
-  }
+      // Ignore the event if the target element is an input or textarea
+      if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+          return;
+      }
 
-  // Check if the key is a valid shortcut key and there are no modifier keys pressed
-  if (!event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey) {
-      switch (key) {
-          case '+':
-              increaseFontSize(); // Increase the font size
-              break;
-          case '-':
-              decreaseFontSize(); // Decrease the font size
-              break;
-          case 'c':
-              toggleContrast(); // Toggle contrast mode
-              break;
-          case 'd':
-              resetContrast(); // Reset contrast mode
-              break;
-          case 'z':
-              increaseLineHeight(); // Increase line height
-              break;
-          case 't':
-              resetLineHeight(); // Reset line height
-              break;
-          case 'r':
-              resetAll(); // Reset all settings
-              break;
-          default:
-              break;
+      // Check if the key is a valid shortcut key and there are no modifier keys pressed
+      if (!event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey) {
+          switch (key) {
+              case '+':
+                  increaseFontSize(); // Increase the font size
+                  break;
+              case '-':
+                  decreaseFontSize(); // Decrease the font size
+                  break;
+              case 'c':
+                  toggleContrast(); // Toggle contrast mode
+                  break;
+              case 'd':
+                  resetContrast(); // Reset contrast mode
+                  break;
+              case 'z':
+                  increaseLineHeight(); // Increase line height
+                  break;
+              case 't':
+                  resetLineHeight(); // Reset line height
+                  break;
+              case 'r':
+                  resetAll(); // Reset all settings
+                  break;
+              default:
+                  break;
+          }
       }
   }
 };
+
 
 // Attach the event listener for key presses
 useEffect(() => {
   window.addEventListener('keydown', handleKeyPress);
 
-  // Clean up by removing the event listener when component unmounts
+  // Clean up by removing the event listener when the component unmounts
   return () => {
       window.removeEventListener('keydown', handleKeyPress);
   };
 }, [fontSize, lineHeight]); // Re-run effect when fontSize or lineHeight change
+
 
     const handleFindPath = async () => {
         console.log("start: ", startNode);

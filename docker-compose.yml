@@ -13,7 +13,7 @@ services:
       - WDS_SOCKET_HOST=127.0.0.1 
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
-      - REACT_APP_BACKEND_URL=http://192.168.0.194:8000/
+      - REACT_APP_BACKEND_URL=http://10.0.0.71:8000
     stdin_open: true
     tty: true
 
